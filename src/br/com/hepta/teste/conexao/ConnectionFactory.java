@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.management.RuntimeErrorException;
-
 public class ConnectionFactory {
     public static Connection criarConexao(){
         String url = "jdbc:mysql://localhost:3306/funcionarios_prova";

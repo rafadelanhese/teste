@@ -12,6 +12,10 @@ public class Setor {
       this.id = id;
       this.nome = nome;
     }
+
+    public Setor(String nome) {      
+      this.nome = nome;
+    }
   
     public Integer getId() {
       return id;

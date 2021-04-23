@@ -9,8 +9,9 @@ import java.util.List;
 
 import br.com.hepta.teste.conexao.ConnectionFactory;
 import br.com.hepta.teste.entity.Setor;
+import br.com.hepta.teste.interfacedao.ISetorDAO;
 
-public class SetorDAO {
+public class SetorDAO implements ISetorDAO{
 
     private Connection connection;
 
@@ -18,6 +19,7 @@ public class SetorDAO {
         this.connection = ConnectionFactory.criarConexao();
     }
 
+    @Override
     public List<Setor> listarTodos(){
         String sql = "SELECT * FROM Setor ORDER BY nome";
         List<Setor> lista = new ArrayList<Setor>();
@@ -44,20 +46,18 @@ public class SetorDAO {
         }    
     }
 
-    public void criar(Setor setor){
+    @Override
+    public boolean criar(Setor setor){
+        boolean setorCriado = false;
         String sql = "INSERT INTO Setor (nome) VALUES (?)";
 
         try{
-
-            PreparedStatement ps = connection.prepareStatement(sql);
-
-            //ps.setInt(1, setor.getId());
+            PreparedStatement ps = connection.prepareStatement(sql);        
             ps.setString(1, setor.getNome());
-
-            ps.execute();
-            ps.close();
-
-        }catch(SQLException e){ 
+            
+            setorCriado = ps.execute();           
+            ps.close();            
+        }catch(SQLException e){            
             if(connection != null){
                 try{
                     connection.rollback();
@@ -66,23 +66,24 @@ public class SetorDAO {
                 }             
             }            
         }
+
+        return setorCriado;
     }
     
-    public void atualizar(Setor setor){
+    @Override
+    public boolean atualizar(Setor setor){
+        boolean setorAtualizado = false;
         String sql = "UPDATE Setor SET nome=? WHERE id_setor=?";
 
         try{
             PreparedStatement ps = connection.prepareStatement(sql);
 
             ps.setString(1, setor.getNome());
-            ps.setInt(2, setor.getId());
+            ps.setInt(2, setor.getId());            
 
-            int retorno = ps.executeUpdate();
-            if(retorno > 0){
-                System.out.printf("Novo registro alterado: %d: %s ",setor.getId(), setor.getNome());
-            }else{
-                System.out.println("Não foi possível alterar os registros!");
-            }
+            if(ps.executeUpdate() > 0)
+                setorAtualizado = !setorAtualizado;
+        
             ps.close();
 
         } catch(SQLException e) { 
@@ -94,8 +95,11 @@ public class SetorDAO {
                 }             
             }            
         } 
+
+        return setorAtualizado;
     }    
 
+    @Override
     public Setor procurarPorId(int id){
         String sql = "SELECT * FROM Setor WHERE id_setor=?";
         Setor setor = null;        
@@ -104,47 +108,79 @@ public class SetorDAO {
             ps.setInt(1, id);
             
             ResultSet rs = ps.executeQuery();
+            
+            if(rs != null && rs.next()){            
+                setor = new Setor(rs.getInt(1), rs.getString(2));                
+            } 
+                            
+            ps.close();
+            rs.close();                    
+        }catch(SQLException e){
+            e.printStackTrace(); 
+            if(connection != null){
+                try{       
+                    connection.setAutoCommit(false);         
+                    connection.rollback();
+                }catch(SQLException rb){
+                    System.out.println("Erro no rollback: " + rb.getMessage());                    
+                }             
+            }                       
+        }    
+        return setor;
+    }
 
-            if(rs != null){
+    @Override
+    public Setor procurarPorNome(String nome){
+        String sql = "SELECT * FROM Setor WHERE nome=?";
+        Setor setor = null;        
+        try{
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, nome);
+            
+            ResultSet rs = ps.executeQuery();
+
+            if(rs != null && rs.next()){
                 setor = new Setor(rs.getInt(1), rs.getString(2));
             }
 
             ps.close();
-            rs.close();
-            return setor;
+            rs.close();                    
         }catch(SQLException e){ 
             if(connection != null){
                 try{
+                    connection.setAutoCommit(false);
                     connection.rollback();
                 }catch(SQLException rb){
                     System.out.println("Erro no rollback: " + rb.getMessage());                    
                 }             
-            }
-            return null;            
+            }                       
         }    
+        return setor;
     }
 
-    public void deletar(int id){
-        String sql = "DELETE FROM Setor WHERE id_setor=?";          
+    @Override
+    public boolean deletar(int id){
+        boolean setorDeletado = false;
+        String sql = "DELETE FROM Setor WHERE id_setor=?"; 
+        
         try{
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
+                        
+            if(ps.executeUpdate() > 0)
+            setorDeletado = !setorDeletado;
             
-            int retorno = ps.executeUpdate();
-            if(retorno > 0){
-                System.out.printf("Registro de ID %d foi deletado",id);
-            }else{
-                System.out.println("Não foi possível deletar!");
-            }  
-            ps.close();
+            ps.close();            
         }catch(SQLException e){ 
             if(connection != null){
                 try{
-                    connection.rollback();
+                    connection.rollback();                    
                 }catch(SQLException rb){
                     System.out.println("Erro no rollback: " + rb.getMessage());                    
                 }             
             }                   
-        }    
+        } 
+        
+        return setorDeletado;
     }
 }
