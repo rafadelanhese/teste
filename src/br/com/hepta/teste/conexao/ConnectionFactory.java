@@ -12,6 +12,7 @@ public class ConnectionFactory {
         Connection connection = null;
 
         try{
+            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
             connection = DriverManager.getConnection(url, usuario, senha);
             return connection;
         } catch(SQLException e){
