@@ -14,26 +14,35 @@ import br.com.hepta.teste.interfacedao.ISetorDAO;
 public class SetorDAO implements ISetorDAO{
 
     private Connection connection;
+    private final int LINHAS_AFETADAS = 0;
 
     public SetorDAO(){
         this.connection = ConnectionFactory.criarConexao();
     }
 
     @Override
+    public void fecharConexao(){
+        try{
+            this.connection.close();
+        }catch(SQLException sqlException){
+            sqlException.printStackTrace();
+        }    
+    }
+
+    @Override
     public List<Setor> listarTodos(){
         String sql = "SELECT * FROM Setor ORDER BY nome";
-        List<Setor> lista = new ArrayList<Setor>();
+        List<Setor> listaSetor = new ArrayList<Setor>();
 
         try{
             PreparedStatement ps = connection.prepareStatement(sql);
             
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
-                lista.add(new Setor(rs.getInt(1), rs.getString(2)));
+                listaSetor.add(new Setor(rs.getInt(1), rs.getString(2)));
             }     
             rs.close();
-            ps.close();             
-            return lista;
+            ps.close();
         }catch(SQLException e){ 
             if(connection != null){
                 try{
@@ -42,8 +51,8 @@ public class SetorDAO implements ISetorDAO{
                     System.out.println("Erro no rollback: " + rb.getMessage());                    
                 }             
             }
-            return null;            
-        }    
+        }
+        return listaSetor;
     }
 
     @Override
@@ -54,8 +63,10 @@ public class SetorDAO implements ISetorDAO{
         try{
             PreparedStatement ps = connection.prepareStatement(sql);        
             ps.setString(1, setor.getNome());
-            
-            setorCriado = ps.execute();           
+
+            if(ps.executeUpdate() > LINHAS_AFETADAS)
+                setorCriado = !setorCriado;
+
             ps.close();            
         }catch(SQLException e){            
             if(connection != null){
@@ -81,7 +92,7 @@ public class SetorDAO implements ISetorDAO{
             ps.setString(1, setor.getNome());
             ps.setInt(2, setor.getId());            
 
-            if(ps.executeUpdate() > 0)
+            if(ps.executeUpdate() > LINHAS_AFETADAS)
                 setorAtualizado = !setorAtualizado;
         
             ps.close();
@@ -167,7 +178,7 @@ public class SetorDAO implements ISetorDAO{
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, id);
                         
-            if(ps.executeUpdate() > 0)
+            if(ps.executeUpdate() > LINHAS_AFETADAS)
             setorDeletado = !setorDeletado;
             
             ps.close();            

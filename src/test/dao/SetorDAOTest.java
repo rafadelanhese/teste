@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,6 +19,11 @@ public class SetorDAOTest{
     @Before
     public void init(){
         this.dao = new SetorDAO();    
+    }
+
+    @After
+    public void encerrar(){
+        this.dao.fecharConexao();
     }
 
 
@@ -39,7 +45,7 @@ public class SetorDAOTest{
 
     @Test
     public void procurarPorNomeTest(){
-        String nomeSetorProcurado = "Teste 3";
+        String nomeSetorProcurado = "Setor Caso de Teste";
         Setor setorEsperado =  dao.procurarPorNome(nomeSetorProcurado);
     
         assertEquals(nomeSetorProcurado, setorEsperado.getNome());
@@ -47,8 +53,12 @@ public class SetorDAOTest{
 
     @Test
     public void atualizarTest(){
-        Setor setorAtualizado = new Setor(2, "Setor Atualizado");
-        boolean atualizouSetor = dao.atualizar(setorAtualizado);    
+        int idSetorAtualizar = 1;
+        Setor setorAtualizar = dao.procurarPorId(idSetorAtualizar);
+
+        setorAtualizar.setNome("Setor Atualizado");
+
+        boolean atualizouSetor = dao.atualizar(setorAtualizar);
     
         assertTrue(atualizouSetor);      
     }
@@ -56,16 +66,16 @@ public class SetorDAOTest{
 
     @Test
     public void listarTodosTest(){
-        int qntdeElementosEsperados = 5;
+        int qtdeElementosEsperados = 1;
         List<Setor> listaSetorEsperada = dao.listarTodos();
 
         assertTrue(!listaSetorEsperada.isEmpty());                
-        assertTrue(listaSetorEsperada.size() == qntdeElementosEsperados);        
+        assertTrue(listaSetorEsperada.size() == qtdeElementosEsperados);
     }
 
     @Test
     public void deletarTest(){
-        int idDeletar = 5;       
+        int idDeletar = 1;
         boolean setorDeletado = dao.deletar(idDeletar);
 
         assertTrue(setorDeletado);                       

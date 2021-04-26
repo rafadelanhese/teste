@@ -6,6 +6,7 @@ import br.com.hepta.teste.entity.Setor;
 
 public interface ISetorDAO {
 
+    public void fecharConexao();
     public List<Setor> listarTodos();
     public boolean criar(Setor setor);
     public boolean atualizar(Setor setor);
