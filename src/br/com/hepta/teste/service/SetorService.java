@@ -36,17 +36,23 @@ public class SetorService {
     }
 
     public Response atualizarSetor(int idSetor, Setor setor){
+        Response response;
         Setor setorAtualizar = setorDAO.procurarPorId(idSetor);
 
-        setorAtualizar.setNome(setor.getNome());
-
-        boolean setorAtualizado = setorDAO.atualizar(setorAtualizar);
-
-        if(setorAtualizado){
-            return Response.status(Response.Status.OK).entity("Setor foi atualizado com sucesso").build();
+        if(setorAtualizar == null){
+            response = Response.status(Response.Status.NOT_FOUND).entity("Setor não encontrado").build();
         }else{
-            return Response.status(Response.Status.NOT_FOUND).entity("Setor não encontrado").build();
+            setorAtualizar.setNome(setor.getNome());
+
+            boolean setorAtualizado = setorDAO.atualizar(setorAtualizar);
+
+            if(setorAtualizado){
+                response = Response.status(Response.Status.OK).entity("Setor foi atualizado com sucesso").build();
+            }else{
+                response = Response.status(Response.Status.BAD_REQUEST).entity("Setor não encontrado").build();
+            }
         }
+        return response;
     }
 
     public Response deletarSetor(int idSetor){
