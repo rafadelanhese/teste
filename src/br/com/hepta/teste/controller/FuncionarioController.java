@@ -35,6 +35,13 @@ public class FuncionarioController {
         return funcionarioService.listarFuncionarios();
     }
 
+    @Path("/{id}") @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response procurarFuncionarioPorId(@PathParam("id") Integer idFuncionario) {
+        return funcionarioService.procurarFuncionarioPorID(idFuncionario);
+    }
+
     @Path("/") @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -46,7 +53,7 @@ public class FuncionarioController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response atualizarFuncionario(@PathParam("id") Integer idFuncionario, Funcionario funcionario) {
-        return funcionarioService.atualizarSetor(idFuncionario, funcionario);
+        return funcionarioService.atualizarFuncionario(idFuncionario, funcionario);
     }
 
     @Path("/{id}") @DELETE

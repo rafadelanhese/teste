@@ -31,31 +31,34 @@ public class SetorController {
         this.request = request;
     }
 
-    @Path("/")
-    @GET
+    @Path("/") @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTodosSetores() {
         return setorService.listaSetores();
     }
 
-    @Path("/")
-    @POST
+    @Path("/") @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response adicionarSetor(Setor setor) {
         return setorService.adicionarSetor(setor);
     }
 
-    @Path("/{id}")
-    @PUT
+    @Path("/{id}") @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response atualizarSetor(@PathParam("id") Integer idSetor, Setor setor) {
         return setorService.atualizarSetor(idSetor, setor);
     }
 
-    @Path("/{id}")
-    @DELETE
+    @Path("/{id}") @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response procurarSetorPorId(@PathParam("id") Integer idSetor) {
+        return setorService.procurarSetorPorId(idSetor);
+    }
+
+    @Path("/{id}") @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletarSetor(@PathParam("id") Integer idSetor) {
        return setorService.deletarSetor(idSetor);
