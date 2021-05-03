@@ -1,8 +1,7 @@
 package test.rest;
 
 import br.com.hepta.teste.entity.Setor;
-import br.com.hepta.teste.rest.SetorController;
-import jdk.net.SocketFlow;
+import br.com.hepta.teste.controller.SetorController;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.FixMethodOrder;
@@ -11,16 +10,10 @@ import org.junit.runners.MethodSorters;
 
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -33,10 +26,13 @@ public class SetorControllerTest extends JerseyTest {
 
     @Test
     public void t1_GetListaSetoresTest(){
-        //final String jsonEsperado = "[{"\"id\"":\"1\""," + "\"nome\":\"Teste 1\"}]";
         Response response = target("/setor").request().get();
         String json = target("/setor").request().get(String.class);
+
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertTrue(json.contains("Teste 1"));
+        assertTrue(json.contains("Teste 3"));
+        assertTrue(json.contains("Teste 4"));
     }
 
     @Test
@@ -62,7 +58,14 @@ public class SetorControllerTest extends JerseyTest {
     }
 
     @Test
-    public void t4_DeleteSetorTest(){
+    public void t4_ProcurarSetorPorIdTest(){
+        Setor setor = target("/setor/1").request().get(Setor.class);
+
+        assertEquals("Teste 1", setor.getNome());
+    }
+
+    @Test
+    public void t5_DeleteSetorTest(){
         Response response = target("/setor/7").request().delete();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());

@@ -2,7 +2,7 @@ package test.rest;
 
 import br.com.hepta.teste.entity.Funcionario;
 import br.com.hepta.teste.entity.Setor;
-import br.com.hepta.teste.rest.FuncionarioController;
+import br.com.hepta.teste.controller.FuncionarioController;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.FixMethodOrder;
@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FuncionarioControllerTest extends JerseyTest {
@@ -27,8 +28,10 @@ public class FuncionarioControllerTest extends JerseyTest {
     @Test
     public void t1_GetListaFuncionariosTest(){
         Response response = target("/funcionario").request().get();
-        //String json = target("/setor").request().get(String.class);
+        String json = target("/funcionario").request().get(String.class);
+
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertTrue(json.contains("Teste Atualização"));
     }
 
     @Test
@@ -54,7 +57,15 @@ public class FuncionarioControllerTest extends JerseyTest {
     }
 
     @Test
-    public void t4_DeleteSetorTest(){
+    public void t4_ProcurarFuncionarioPorIdTest(){
+        Funcionario funcionario = target("/funcionario/3").request().get(Funcionario.class);
+
+        assertEquals("Teste Atualização", funcionario.getNome());
+        assertEquals("gmail@gmail.com", funcionario.getEmail());
+    }
+
+    @Test
+    public void t5_DeleteSetorTest(){
         Response response = target("/funcionario/5").request().delete();
 
         assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
