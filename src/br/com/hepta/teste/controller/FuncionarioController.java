@@ -1,4 +1,4 @@
-package br.com.hepta.teste.rest;
+package br.com.hepta.teste.controller;
 
 import br.com.hepta.teste.entity.Funcionario;
 import br.com.hepta.teste.service.FuncionarioService;

@@ -1,4 +1,4 @@
-package br.com.hepta.teste.rest;
+package br.com.hepta.teste.controller;
 
 
 import br.com.hepta.teste.entity.Setor;
@@ -6,7 +6,6 @@ import br.com.hepta.teste.service.SetorService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
