@@ -55,6 +55,18 @@ public class SetorService {
         return response;
     }
 
+    public Response procurarSetorPorId(int idSetor){
+        Response response;
+        Setor setor = setorDAO.procurarPorId(idSetor);
+
+        if(setor == null){
+            response = Response.status(Response.Status.NOT_FOUND).entity("Setor não encontrado").build();
+        }else{
+            response = Response.status(Response.Status.OK).entity(setor).build();
+        }
+        return response;
+    }
+
     public Response deletarSetor(int idSetor){
         boolean setorDeletado = setorDAO.deletar(idSetor);
 

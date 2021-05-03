@@ -36,7 +36,7 @@ public class FuncionarioService {
         }
     }
 
-    public Response atualizarSetor(int idFuncionario, Funcionario funcionario){
+    public Response atualizarFuncionario(int idFuncionario, Funcionario funcionario){
         Response response;
         Funcionario funcionarioAtualizar = funcionarioDAO.procurarPorId(idFuncionario);
 
@@ -56,6 +56,19 @@ public class FuncionarioService {
             }else{
                 response =  Response.status(Response.Status.BAD_REQUEST).entity("Funcionário não encontrado").build();
             }
+        }
+
+        return response;
+    }
+
+    public Response procurarFuncionarioPorID(int idFuncionario){
+        Response response;
+        Funcionario funcionario = funcionarioDAO.procurarPorId(idFuncionario);
+
+        if(funcionario == null){
+            response = Response.status(Response.Status.NOT_FOUND).entity("Funcionário não encontrado").build();
+        }else{
+            response =  Response.status(Response.Status.OK).entity(funcionario).build();
         }
 
         return response;
