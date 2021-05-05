@@ -1,13 +1,16 @@
 const HTTP_STATUS_OK = 200;
 var URL = "http://localhost:8080/projeto-teste/rs/setor";
-window.onload = getTodosSetores;
+
+window.addEventListener("load", function(event) {
+    getTodosSetores();
+});
 
 function getTodosSetores() {
   var xhttp = new XMLHttpRequest();
   xhttp.open("GET", URL, true);
   xhttp.send();
   xhttp.onreadystatechange = function() {
-    if (this.status == HTTP_STATUS_OK) {
+    if (xhttp.status == HTTP_STATUS_OK) {
       var listaSetores = JSON.parse(this.responseText);
 
 	  var linhasTabela = "<tr><th>ID</th><th>Nome</th><th>Editar</th><th>Excluir</th></tr>";
@@ -27,8 +30,8 @@ function linhaTabela(setor){
 	return "<tr>"
 	+ "<td>"+ setor.id +"</td>"
 	+"<td>"+ setor.nome +"</td>"
-	+"<td><button onclick='editar("+ setor.id +")'>Editar</button></td>"
-	+"<td><button onclick='excluir("+ setor.id +")'>Excluir</button></td></tr>"
+	+"<td><button class=\"btn btn-primary\" onclick='editar("+ setor.id +")'>Editar</button></td>"
+	+"<td><button class=\"btn btn-danger\" onclick='excluir("+ setor.id +")'>Excluir</button></td></tr>"
 }
 
 function editar(idSetor){
@@ -41,7 +44,7 @@ function excluir(idSetor){
 	xhttp.open("DELETE", URL.concat('/', idSetor), true);
 	xhttp.onreadystatechange = function(){
 	    if(xhttp.readyState === XMLHttpRequest.DONE){
-            if(xhttp.status === 0 || xhttp.status == HTTP_STATUS_OK){
+            if(xhttp.status == HTTP_STATUS_OK){
                 console.log(xhttp.responseText);
                 getTodosSetores();
             } else {

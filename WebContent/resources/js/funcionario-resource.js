@@ -1,7 +1,9 @@
 var URL =  "http://localhost:8080/projeto-teste/rs/funcionario";
 const HTTP_STATUS_OK = 200;
 
-window.onload = getTodosFuncionarios;
+window.addEventListener("load", function(event) {
+    getTodosFuncionarios();
+});
 
 function getTodosFuncionarios() {
   var xhttp = new XMLHttpRequest();

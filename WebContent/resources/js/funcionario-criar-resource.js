@@ -1,35 +1,52 @@
 var URL =  "http://localhost:8080/projeto-teste/rs/funcionario";
-var botaoEnviarFormulario = document.getElementById("enviar");
+var botaoEnviar = document.getElementById("enviar");
+var botaoAtualizar = document.getElementById("atualizar");
 const HTTP_STATUS_OK = 200;
 const HTTP_STATUS_CREATED = 201;
-
 
 window.addEventListener("load", function(event) {
     getTodosSetores();
     temDadosLocalStorage();
 });
 
-botaoEnviarFormulario.addEventListener("click", function (event) {
+botaoEnviar.addEventListener("click", function (event) {
   event.preventDefault();
-  var id = document.getElementById('id').value;
-
   if(validarCamposFormulario()){
-    var json = serialize();
-    var xhttp = new XMLHttpRequest();
-    if(id == null || id == ''){
-          xhttp.open("POST", URL, true);
-      } else {
-          xhttp.open("PUT", URL.concat("/", id), true);
-      }
+      var json = serialize();
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", URL, true);
       xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       xhttp.send(json);
       xhttp.onreadystatechange = function(){
         if(xhttp.readyState === XMLHttpRequest.DONE){
-              if(xhttp.status == HTTP_STATUS_OK || xhttp.status == HTTP_STATUS_CREATED){
-                  console.log(xhttp.responseText);
+              if(xhttp.status == HTTP_STATUS_CREATED){
+                  exibeToast(xhttp.responseText);
                   initDadosForm();
               } else {
-                  console.log(xhttp.responseText);
+                  exibeToast("Não foi possivel cadastrar o funcionário");
+              }
+         }
+      }
+  }
+});
+
+botaoAtualizar.addEventListener("click", function (event) {
+  event.preventDefault();
+
+  if(validarCamposFormulario()){
+      var json = serialize();
+      var xhttp = new XMLHttpRequest();
+      var id = document.getElementById('id').value;
+      xhttp.open("PUT", URL.concat("/", id), true);
+      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhttp.send(json);
+      xhttp.onreadystatechange = function(){
+        if(xhttp.readyState === XMLHttpRequest.DONE){
+              if(xhttp.status == HTTP_STATUS_OK){
+                  exibeToast(xhttp.responseText);
+                  initDadosForm();
+              } else {
+                  exibeToast(xhttp.responseText);
               }
          }
       }
@@ -68,6 +85,7 @@ function temDadosLocalStorage(){
         if (xhttp.status == HTTP_STATUS_OK) {
 			var funcionario = JSON.parse(this.responseText);
 			preencheDadosForm(funcionario);
+			exibeBotaoAtualizarEOcultaBotaoEnviar();
         } else {
           console.log("Algo deu errado");
         }
@@ -130,12 +148,17 @@ function validarCamposFormulario(){
     && validaVazioOuNulo(formulario.salario) && validaMenorQueZero(formulario.salario) && validaMenorQueZero(formulario.email)){
         return true;
     } else {
+        exibeToast("Contém erros no preenchimento do formulário, verifique os campos indicados");
         return false;
     }
 }
 
 function validaVazioOuNulo(valor){
-    return valor.value == '' || valor.value == null ? valor.focus() : true;
+    if(valor.value == '' || valor.value == null){
+        valor.focus();
+        return false;
+    }
+    return true;
 }
 
 function validaMenorQueZero(valor){
@@ -146,5 +169,15 @@ function validaMenorQueZero(valor){
 function validaIdade(valor){
     const idadeMaxima = 100;
     return valor.value > idadeMaxima ? valor.focus() : true;
+}
+
+function exibeBotaoAtualizarEOcultaBotaoEnviar(){
+    document.getElementById('atualizar').style.display = 'inline';
+    document.getElementById('enviar').style.display = 'none';
+}
+
+function exibeToast(mensagem){
+    document.getElementById("paragrafoToast").innerHTML = mensagem;
+    $('#toastMensagem').toast('show');
 }
 
