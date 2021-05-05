@@ -1,5 +1,7 @@
 var URL = "http://localhost:8080/projeto-teste/rs/setor";
 var enviar = document.getElementById("enviar");
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_CREATED = 201;
 
 window.addEventListener("load", function(event) {
     temDadosLocalStorage();
@@ -22,7 +24,7 @@ enviar.addEventListener("click", function (event) {
   xhttp.send(JSON.stringify(json));
   xhttp.onreadystatechange = function(){
   	    if(xhttp.readyState === XMLHttpRequest.DONE){
-              if(xhttp.status === 0 || (xhttp.status == 200 || xhttp.status == 201)){
+              if(xhttp.status == HTTP_STATUS_OK || xhttp.status == HTTP_STATUS_CREATED){
                   console.log(xhttp.responseText);
                   initDadosForm();
               } else {
@@ -41,7 +43,7 @@ function temDadosLocalStorage(){
       xhttp.open("GET", URL.concat('/', id), true);
       xhttp.send();
       xhttp.onreadystatechange = function() {
-        if (this.status == 200) {
+        if (this.status == HTTP_STATUS_OK) {
 			var setor = JSON.parse(this.responseText);
 			preencheDadosForm(setor);
         } else {

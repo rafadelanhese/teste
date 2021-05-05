@@ -1,34 +1,39 @@
 var URL =  "http://localhost:8080/projeto-teste/rs/funcionario";
-var enviar = document.getElementById("enviar");
+var botaoEnviarFormulario = document.getElementById("enviar");
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_CREATED = 201;
+
 
 window.addEventListener("load", function(event) {
     getTodosSetores();
     temDadosLocalStorage();
 });
 
-enviar.addEventListener("click", function (event) {
+botaoEnviarFormulario.addEventListener("click", function (event) {
   event.preventDefault();
   var id = document.getElementById('id').value;
-  var json = serialize();
-  var xhttp = new XMLHttpRequest();
 
-  if(id == null || id == ''){
-      xhttp.open("POST", URL, true);
-  } else {
-      xhttp.open("PUT", URL.concat("/", id), true);
-  }
-  xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xhttp.send(JSON.stringify(json));
-  xhttp.onreadystatechange = function(){
-    if(xhttp.readyState === XMLHttpRequest.DONE){
-          if(xhttp.status === 0 || (xhttp.status == 200 || xhttp.status == 201)){
-              console.log(xhttp.responseText);
-              initDadosForm();
-          } else {
-              console.log(xhttp.responseText);
-          }
+  if(validarCamposFormulario()){
+    var json = serialize();
+    var xhttp = new XMLHttpRequest();
+    if(id == null || id == ''){
+          xhttp.open("POST", URL, true);
+      } else {
+          xhttp.open("PUT", URL.concat("/", id), true);
       }
-  	}
+      xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhttp.send(json);
+      xhttp.onreadystatechange = function(){
+        if(xhttp.readyState === XMLHttpRequest.DONE){
+              if(xhttp.status == HTTP_STATUS_OK || xhttp.status == HTTP_STATUS_CREATED){
+                  console.log(xhttp.responseText);
+                  initDadosForm();
+              } else {
+                  console.log(xhttp.responseText);
+              }
+         }
+      }
+  }
 });
 
 var serialize = function () {
@@ -38,9 +43,17 @@ var serialize = function () {
   var keys = data.keys();
   for (var key = keys.next(); !key.done; key = keys.next()) {
       var values = data.getAll(key.value);
-      json[key.value] = values.length == 1 ? values[0] : values;
+	  if(key.value == "setor"){
+	      var setor = {};
+          var setorOption = document.getElementById(values[0]);
+          setor["id"] = values[0];
+          setor["nome"] = setorOption.dataset.nome;
+          json[key.value] = setor;
+	  } else {
+		json[key.value] = values.length == 1 ? values[0] : values;
+	  }
     }
-  return json;
+  return JSON.stringify(json);
 }
 
 function temDadosLocalStorage(){
@@ -52,7 +65,7 @@ function temDadosLocalStorage(){
       xhttp.open("GET", URL.concat("/", id), true);
       xhttp.send();
       xhttp.onreadystatechange = function() {
-        if (xhttp.status == 200) {
+        if (xhttp.status == HTTP_STATUS_OK) {
 			var funcionario = JSON.parse(this.responseText);
 			preencheDadosForm(funcionario);
         } else {
@@ -65,10 +78,10 @@ function temDadosLocalStorage(){
 function preencheDadosForm(funcionario){
     formulario.id.value = funcionario.id;
     formulario.nome.value = funcionario.nome;
-	 formulario.idade.value = funcionario.idade;
+	formulario.idade.value = funcionario.idade;
     formulario.email.value = funcionario.email;
     formulario.salario.value = funcionario.salario;
-	formulario.setor.value = funcionario.setor.id;
+	document.getElementById("setor").value = funcionario.setor.id;
 }
 
 function initDadosForm(){
@@ -85,26 +98,36 @@ function getTodosSetores(){
   xhttp.open("GET", "http://localhost:8080/projeto-teste/rs/setor", true);
   xhttp.send();
   xhttp.onreadystatechange = function() {
-    if (xhttp.status == 200) {
+    if (xhttp.status == HTTP_STATUS_OK) {
       var listaSetores = JSON.parse(xhttp.responseText);
 
-	  var optionSelect = "";
-      var setor;
-	  for(var posicao = 0; posicao < listaSetores.length; posicao++){
-	      setor = listaSetores[posicao];
-		  optionSelect += "<option value="+ setor.id +">"+ setor.nome +"</option>";
-	  }
-	  document.getElementById("setor").innerHTML = optionSelect;
+      populaSelectSetores(listaSetores);
     } else {
       console.log("Algo deu errado");
     }
   };
 }
 
+function populaSelectSetores(listaSetores){
+    const qtdeMinimaElementos = 0;
+    var select = document.getElementById('setor');
+    if(select.childElementCount > qtdeMinimaElementos){
+      select.clear();
+    }
+    for(var setor of listaSetores){
+        var option = document.createElement('option');
+        option.setAttribute("id", setor.id);
+        option.setAttribute("data-nome", setor.nome);
+        option.value = setor.id;
+        option.text = setor.nome;
+        select.appendChild(option);
+    }
+}
+
 function validarCamposFormulario(){
     if(validaVazioOuNulo(formulario.nome) && validaVazioOuNulo(formulario.idade)
-    && validaMenosQueZero(formulario.idade) && validaVazioOuNulo(formulario.email)
-    && validaVazioOuNulo(formulario.salario) && validaMenosQueZero(formulario.salario) && validaMenosQueZero(formulario.email)){
+    && validaIdade(formulario.idade) && validaMenorQueZero(formulario.idade) && validaVazioOuNulo(formulario.email)
+    && validaVazioOuNulo(formulario.salario) && validaMenorQueZero(formulario.salario) && validaMenorQueZero(formulario.email)){
         return true;
     } else {
         return false;
@@ -112,20 +135,16 @@ function validarCamposFormulario(){
 }
 
 function validaVazioOuNulo(valor){
-    if(valor.value == '' || valor.value == null){
-        valor.focus();
-        return false;
-    } else {
-        return true;
-    }
+    return valor.value == '' || valor.value == null ? valor.focus() : true;
 }
 
-function validaMenosQueZero(valor){
-   if(valor.value < 0){
-        valor.focus();
-        return false;
-    } else {
-        return true;
-    }
+function validaMenorQueZero(valor){
+   const valorZerado = 0;
+   return valor.value < valorZerado ? valor.focus() : true;
+}
+
+function validaIdade(valor){
+    const idadeMaxima = 100;
+    return valor.value > idadeMaxima ? valor.focus() : true;
 }
 
