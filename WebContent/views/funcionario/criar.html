@@ -40,8 +40,7 @@
         </div>
     </div>
 </nav>
-<br></br>
-<br></br>
+
 <div class="container float">
     <form action="" id="formulario" name="formulario">
         <input type="text" class="form-control" id="id" name="id" aria-describedby="setor" style="display:none" \>
@@ -66,8 +65,22 @@
             <select class="form-control" aria-describedby="setor" id="setor" name="setor"></select>
         </div>
         </br>
-        <button type="button" id="enviar" name="enviar" class="btn btn-primary">Salvar</button>
+        <button type="submit" id="enviar" name="enviar" class="btn btn-primary">Salvar</button>
+        <button type="submit" id="atualizar" name="atualizar" class="btn btn-success" style="display: none">Atualizar</button>
     </form>
+</div>
+
+<div class="container-fuid">
+    <div  aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+        <div id="toastMensagem" name="toastMensagem" class="toast" style="position: absolute; top: 0; right: 0;">
+            <div class="toast-header">
+                <strong class="mr-auto">Mensagem</strong>
+            </div>
+            <div class="toast-body">
+                <p id="paragrafoToast"></p>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>
