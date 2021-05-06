@@ -42,17 +42,23 @@ function editar(idSetor){
 function excluir(idSetor){
 	var xhttp = new XMLHttpRequest();
 	xhttp.open("DELETE", URL.concat('/', idSetor), true);
+	xhttp.send();
 	xhttp.onreadystatechange = function(){
 	    if(xhttp.readyState === XMLHttpRequest.DONE){
             if(xhttp.status == HTTP_STATUS_OK){
-                console.log(xhttp.responseText);
+                exibeToast("Setor excluído com sucesso")
                 getTodosSetores();
             } else {
-                console.log("Funcionário não foi deletado");
+                exibeToast("Setor não foi excluído")
             }
         }
 	}
-	xhttp.send();
 }
+
+function exibeToast(mensagem){
+    document.getElementById("paragrafoToast").innerHTML = mensagem;
+    $('#toastMensagem').toast('show');
+}
+
 
 
